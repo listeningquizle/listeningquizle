@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Choral Music Through the Ages</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 700px; margin: auto; padding: 20px; }
+    h1 { text-align: center; }
+    .hidden { display: none; }
+    label { display: block; margin-top: 10px; }
+    input { width: 100%; padding: 8px; margin-top: 4px; }
+    #scoreBox { font-size: 1.2em; margin-top: 20px; }
+  </style>
+</head>
+
+<body>
+  <h1>Choral Music Through the Ages</h1>
+
+  <div id="game">
+    <div id="roundInfo"></div>
+    <div id="player"></div>
+
+    <form id="answerForm">
+      <label>Composer <input name="composer"></label>
+      <label>Period <input name="period"></label>
+      <label>Year <input name="year" type="number"></label>
+      <label>Country <input name="country"></label>
+      <label>Language <input name="language"></label>
+      <label>Genre <input name="genre"></label>
+      <button type="submit" style="margin-top:20px;">Submit Answers</button>
+    </form>
+
+    <div id="scoreBox"></div>
+  </div>
+
+  <script>
+    const pieces = [
+      {
+        title: "Ave Maria",
+        composer: "Josquin des Prez",
+        period: "Renaissance",
+        year: 1485,
+        country: "France",
+        language: "Latin",
+        genre: "Sacred",
+        youtube: "https://www.youtube.com/embed/qnX3VEX6sY8"
+      },
+      {
+        title: "Messiah - Hallelujah",
+        composer: "George Frideric Handel",
+        period: "Baroque",
+        year: 1741,
+        country: "England",
+        language: "English",
+        genre: "Sacred",
+        youtube: "https://www.youtube.com/embed/IUZEtVbJT5c"
+      }
+    ];
+
+    let round = 0;
+    let totalScore = 0;
+
+    function loadRound() {
+      const piece = pieces[round];
+      document.getElementById("roundInfo").innerHTML =
+        `<h2>Round ${round + 1}: ${piece.title}</h2>`;
+      document.getElementById("player").innerHTML =
+        `<iframe width="560" height="315" src="${piece.youtube}" allowfullscreen></iframe>`;
+    }
+
+    function scoreRound(user, correct) {
+      let score = 0;
+      if (user.composer.toLowerCase() === correct.composer.toLowerCase()) score++;
+      if (user.period.toLowerCase() === correct.period.toLowerCase()) score++;
+      if (Math.abs(user.year - correct.year) <= 10) score++;
+      if (user.country.toLowerCase() === correct.country.toLowerCase()) score++;
+      if (user.language.toLowerCase() === correct.language.toLowerCase()) score++;
+      if (user.genre.toLowerCase() === correct.genre.toLowerCase()) score++;
+      return score;
+    }
+
+    document.getElementById("answerForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const user = Object.fromEntries(formData.entries());
+      user.year = parseInt(user.year);
+
+      const correct = pieces[round];
+      const roundScore = scoreRound(user, correct);
+      totalScore += roundScore;
+
+      document.getElementById("scoreBox").innerHTML =
+        `You scored ${roundScore} this round. Total: ${totalScore}`;
+
+      round++;
+      if (round < 5 && round < pieces.length) {
+        loadRound();
+        e.target.reset();
+      } else {
+        document.getElementById("game").innerHTML =
+          `<h2>Final Score: ${totalScore} / ${pieces.length * 6}</h2>`;
+      }
+    });
+
+    loadRound();
+  </script>
+</body>
+</html>
