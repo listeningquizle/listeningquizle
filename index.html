@@ -6,10 +6,16 @@
   <style>
     body { font-family: Arial, sans-serif; max-width: 700px; margin: auto; padding: 20px; }
     h1 { text-align: center; }
-    .hidden { display: none; }
     label { display: block; margin-top: 10px; }
     input { width: 100%; padding: 8px; margin-top: 4px; }
     #scoreBox { font-size: 1.2em; margin-top: 20px; }
+    .hiddenVideo {
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+    }
   </style>
 </head>
 
@@ -21,6 +27,7 @@
     <div id="player"></div>
 
     <form id="answerForm">
+      <label>Song Title <input name="title"></label>
       <label>Composer <input name="composer"></label>
       <label>Period <input name="period"></label>
       <label>Year <input name="year" type="number"></label>
@@ -46,7 +53,7 @@
         youtube: "https://www.youtube.com/embed/qnX3VEX6sY8"
       },
       {
-        title: "Messiah - Hallelujah",
+        title: "Hallelujah Chorus",
         composer: "George Frideric Handel",
         period: "Baroque",
         year: 1741,
@@ -63,13 +70,16 @@
     function loadRound() {
       const piece = pieces[round];
       document.getElementById("roundInfo").innerHTML =
-        `<h2>Round ${round + 1}: ${piece.title}</h2>`;
+        `<h2>Round ${round + 1}</h2>`;
+
+      // Invisible audio-only YouTube embed
       document.getElementById("player").innerHTML =
-        `<iframe width="560" height="315" src="${piece.youtube}" allowfullscreen></iframe>`;
+        `<iframe class="hiddenVideo" src="${piece.youtube}?autoplay=1" allow="autoplay"></iframe>`;
     }
 
     function scoreRound(user, correct) {
       let score = 0;
+      if (user.title.toLowerCase() === correct.title.toLowerCase()) score++;
       if (user.composer.toLowerCase() === correct.composer.toLowerCase()) score++;
       if (user.period.toLowerCase() === correct.period.toLowerCase()) score++;
       if (Math.abs(user.year - correct.year) <= 10) score++;
@@ -98,7 +108,7 @@
         e.target.reset();
       } else {
         document.getElementById("game").innerHTML =
-          `<h2>Final Score: ${totalScore} / ${pieces.length * 6}</h2>`;
+          `<h2>Final Score: ${totalScore} / ${pieces.length * 7}</h2>`;
       }
     });
 
